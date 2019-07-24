@@ -1,6 +1,13 @@
 
+const path = require("path");
+
 const YOUTUBE = require("freefolkcommon").YOUTUBE({
-    CREDENTIALS: require("./../FreefolkCredentials.json")
+    CREDENTIALS: require("./../FreefolkCredentials.json"),
+    tmpDir: path.join(__dirname, "..", "tmp"),
+    ffmpegPaths: {
+        linuxPath: path.join(__dirname, "..", "ffmpeg-src", "debian-64/ffmpeg"),
+        windowsPath: path.join(__dirname, "..", "ffmpeg-src", "win-64/bin/ffmpeg")
+    }
 });
 
 const YOUTUBE_MAPPING = (args) => {
@@ -15,6 +22,7 @@ const YOUTUBE_MAPPING = (args) => {
             YOUTUBE.getVideosInfo({ids: req.body.ids})
             .then(videos => res.send(videos))
             .catch(error => {
+                console.error(error);
                 res.status(500);
                 res.send(error);
             });
@@ -60,40 +68,49 @@ const YOUTUBE_MAPPING = (args) => {
                     if (req.body.mp3) {
                         if (items.length === 1) {
                             const item = items[0];
+                            const filename = YOUTUBE.safeFilename(item.title) + ".mp3";
                             res.setHeader('Content-disposition', 
-                            'attachment; filename=' 
-                            + YOUTUBE.safeFilename(item.title) + ".mp3");
+                            'attachment; filename=' + filename);
+                            res.setHeader("x-suggested-filename", filename);
                             YOUTUBE.downloadMusic({
                                 id: item.id,
                                 pipe: res
                             }).catch(error => {
+                                console.error(error);
                                 res.status(500);
                                 res.send(error);
                             });
                         } else {
+                            const errMsg = "Not implemented yet (Multiple download)";
+                            console.error(errMsg);
                             res.status(404);
-                            res.send("Not implemented yet (Multiple download)");
+                            res.send(errMsg);
                         }
                     } else {
                         if (items.length === 1) {
                             const item = items[0];
+                            const filename = YOUTUBE.safeFilename(item.title) + ".mp4";
                             res.setHeader('Content-disposition', 
-                            'attachment; filename=' 
-                            + YOUTUBE.safeFilename(item.title) + ".mp4");
+                            'attachment; filename=' + filename);
+                            res.setHeader("x-suggested-filename", filename);
                             YOUTUBE.downloadVideo({
                                 id: item.id,
                                 pipe: res
                             }).catch(error => {
+                                console.error(error);
                                 res.status(500);
                                 res.send(error);
                             });
                         } else {
+                            const errMsg = "Not implemented yet (Multiple download)";
+                            console.error(errMsg);
                             res.status(404);
-                            res.send("Not implemented yet (Multiple download)");
+                            res.send(errMsg);
                         }
                     }
                 }
             }).catch(error => {
+                console.error(error);
                 res.status(500);
                 res.send(error);
             });

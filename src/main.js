@@ -15,4 +15,6 @@ require("./user-config").CONFIG_MAPPING({app});
 app.use('/home', express.static(path.join(__dirname, "..", "web-dist")));
 app.get('/home*', (req, res) => res.sendFile(path.join(__dirname, "..", "web-dist", "index.html")));
 
+app.get("/*", (req, res) => res.redirect("/home"));
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
