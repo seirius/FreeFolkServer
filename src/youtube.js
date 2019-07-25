@@ -5,8 +5,8 @@ const YOUTUBE = require("freefolkcommon").YOUTUBE({
     CREDENTIALS: require("./../FreefolkCredentials.json"),
     tmpDir: path.join(__dirname, "..", "tmp"),
     ffmpegPaths: {
-        linuxPath: path.join(__dirname, "..", "ffmpeg-src", "debian-64/ffmpeg"),
-        windowsPath: path.join(__dirname, "..", "ffmpeg-src", "win-64/bin/ffmpeg")
+        // linuxPath: path.join(__dirname, "..", "ffmpeg-src", "debian-64/ffmpeg"),
+        // windowsPath: path.join(__dirname, "..", "ffmpeg-src", "win-64/bin/ffmpeg")
     }
 });
 
@@ -58,15 +58,15 @@ const YOUTUBE_MAPPING = (args) => {
     });
 
     app.post("/youtube/download", (req, res) => {
-        if (!req.body || !req.body.ids) {
+        if (!req.body || !req.body.id) {
             res.status(401);
-            res.send("No IDS present");
+            res.send("No ID defined");
         } else {
-            YOUTUBE.getVideosInfo({ids: req.body.ids})
+            YOUTUBE.getVideosInfo({ids: [req.body.id]})
             .then(items => {
                 if (items && items.length) {
                     if (req.body.mp3) {
-                        if (items.length === 1) {
+                        if (items.length) {
                             const item = items[0];
                             const filename = YOUTUBE.safeFilename(item.title) + ".mp3";
                             res.setHeader('Content-disposition', 
@@ -81,13 +81,13 @@ const YOUTUBE_MAPPING = (args) => {
                                 res.send(error);
                             });
                         } else {
-                            const errMsg = "Not implemented yet (Multiple download)";
+                            const errMsg = "No items to download";
                             console.error(errMsg);
                             res.status(404);
                             res.send(errMsg);
                         }
                     } else {
-                        if (items.length === 1) {
+                        if (items.length) {
                             const item = items[0];
                             const filename = YOUTUBE.safeFilename(item.title) + ".mp4";
                             res.setHeader('Content-disposition', 
@@ -96,13 +96,13 @@ const YOUTUBE_MAPPING = (args) => {
                             YOUTUBE.downloadVideo({
                                 id: item.id,
                                 pipe: res
-                            }).catch(error => {
+                            }).then(() => res.end()).catch(error => {
                                 console.error(error);
                                 res.status(500);
                                 res.send(error);
                             });
                         } else {
-                            const errMsg = "Not implemented yet (Multiple download)";
+                            const errMsg = "No items to download";
                             console.error(errMsg);
                             res.status(404);
                             res.send(errMsg);
