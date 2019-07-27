@@ -48,9 +48,6 @@ app.use(session({
         maxAge: 60000 * 60 * 24 * 30
     }
 }));
-
-app.use(express.static(__dirname, { dotfiles: "allow" } ));
-
 require("./youtube").YOUTUBE_MAPPING({app});
 require("./user-config").CONFIG_MAPPING({app});
 
@@ -65,6 +62,8 @@ app.all("*", (req, res, next) => {
 	}
 	res.redirect("/home");
 });*/
+
+app.use(express.static(__dirname, { dotfiles: "allow" } ));
 
 const httpServer = http.createServer(app);
 httpServer.listen(port, () => console.log(`FreeFolk is running on ${port}`));
