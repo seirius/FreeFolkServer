@@ -7,27 +7,17 @@ const cookieParser = require('cookie-parser');
 
 const http = require("http");
 const https = require("https");
-const fs = require("fs");
 
 const app = express();
 const port = 80;
 
-let credentialsPath;
-process.argv.forEach(val => {
-	if (val && val.indexOf("--credentials") > -1) {
-		credentialsPath = val.split("=")[1];
-	}
-});
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/freefolk.media/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/yourdomain.comconst privateKey = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/chain.pem', 'utf8');/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/chain.pem', 'utf8');
 
-let credentials;
-if (credentialsPath) {
-	const paths = JSON.parse(fs.readFileSync(credentialsPath));
-	credentials = {
-		privateKey: fs.readFileSync(paths.privateKey, "utf8"),
-		certificate: fs.readFileSync(paths.certificate, "utf8"),
-		ca: fs.readFileSync(paths.ca, "utf8")
-	};
-}
+
 
 app.use(cookieParser());
 app.use(bodyParser.json());       // to support JSON-encoded bodies
@@ -49,27 +39,14 @@ app.use(session({
     }
 }));
 
-app.use(express.static(__dirname, { dotfiles: "allow" } ));
-
 require("./youtube").YOUTUBE_MAPPING({app});
 require("./user-config").CONFIG_MAPPING({app});
 
+app.use(express.static(__dirname, {dotfiles: "allow"}));
+
 app.use('/home', express.static(path.join(__dirname, "..", "web-dist")));
 app.get('/home*', (req, res) => res.sendFile(path.join(__dirname, "..", "web-dist", "index.html")));
-/*
-app.all("*", (req, res, next) => {
-	console.log(credentials);
-	console.log(req.secure);
-	if (credentials && !req.secure) {
-			//return res.redirect("https://" + req.hostname + req.url);
-	}
-	res.redirect("/home");
-});*/
 
-const httpServer = http.createServer(app);
-httpServer.listen(port, () => console.log(`FreeFolk is running on ${port}`));
+app.get("/*", (req, res) => res.redirect("/home"));
 
-if (credentials) {
-	const httpsServer = https.createServer(credentials, app);
-	httpsServer.listen(443, () => console.log(`FreeFolkSecure is running on 443`));
-}
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
