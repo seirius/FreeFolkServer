@@ -23,8 +23,8 @@ let credentials;
 if (credentialsPath) {
 	const paths = JSON.parse(fs.readFileSync(credentialsPath));
 	credentials = {
-		privateKey: fs.readFileSync(paths.privateKey, "utf8"),
-		certificate: fs.readFileSync(paths.certificate, "utf8"),
+		key: fs.readFileSync(paths.privateKey, "utf8"),
+		cert: fs.readFileSync(paths.certificate, "utf8"),
 		ca: fs.readFileSync(paths.ca, "utf8")
 	};
 }
