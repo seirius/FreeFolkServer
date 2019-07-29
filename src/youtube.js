@@ -75,7 +75,7 @@ const YOUTUBE_MAPPING = (args) => {
                             YOUTUBE.downloadMusic({
                                 id: item.id,
                                 pipe: res
-                            }).catch(error => {
+                            }).then(() => res.end()).catch(error => {
                                 console.error(error);
                                 res.status(500);
                                 res.send(error);

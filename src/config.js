@@ -75,3 +75,8 @@ async function loadCredentials (args) {
 
     return credentials;
 }
+
+exports.credentialsPresent = function (args) {
+    const { credentials } = args;
+    return credentials && Object.values(credentials).some(value => value);
+}
