@@ -5,7 +5,7 @@ exports.START_SERVER = async function (args) {
     const session = require('express-session');
     const MongoStore = require('connect-mongo')(session);
     const cookieParser = require('cookie-parser');
-    const { loadConfig, credentialsPresent } = require("./config");
+    const { loadConfig, credentialsPresent, secureRedirect } = require("./config");
 
     const http = require("http");
     const https = require("https");
@@ -40,12 +40,16 @@ exports.START_SERVER = async function (args) {
     require("./user-config").CONFIG_MAPPING({ app });
 
     app.use('/home', express.static(path.join(__dirname, "..", "web-dist")));
-    app.get('/home*', (req, res) => res.sendFile(path.join(__dirname, "..", "web-dist", "index.html")));
+    app.get('/home/**', (req, res) => {
+        if (secureRedirect({credentials: config.credentials, req, res})) {
+            return;
+        }
+        res.sendFile(path.join(__dirname, "..", "web-dist", "index.html"));
+    });
 
     app.all("*", (req, res) => {
-        if (!req.secure && credentialsPresent({credentials: config.credentials})) {
-            console.log("redirect to secure");
-            return res.redirect("https://" + req.hostname + req.url);
+        if (secureRedirect({credentials: config.credentials, req, res})) {
+            return;
         }
 
         return res.redirect("/home");

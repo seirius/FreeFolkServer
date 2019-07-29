@@ -76,7 +76,17 @@ async function loadCredentials (args) {
     return credentials;
 }
 
-exports.credentialsPresent = function (args) {
+const credentialsPresent = function (args) {
     const { credentials } = args;
     return credentials && Object.values(credentials).some(value => value);
+}; 
+
+exports.credentialsPresent = credentialsPresent;
+
+exports.secureRedirect = function (args) {
+    const { credentials, req, res } = args;
+    if (!req.secure && credentialsPresent({credentials})) {
+        res.redirect("https://" + req.hostname + req.url);
+        return true;
+    }
 }
