@@ -38,6 +38,7 @@ exports.START_SERVER = async function (args) {
 
     require("./youtube").YOUTUBE_MAPPING({ app });
     require("./user-config").CONFIG_MAPPING({ app });
+    require("./meta").META_MAPPING({ app });
 
     app.use('/home', express.static(path.join(__dirname, "..", "web-dist")));
     app.get('/home/**', (req, res) => {
