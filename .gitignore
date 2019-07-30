@@ -63,7 +63,7 @@ typings/
 FreefolkCredentials.json
 
 .well-known/
-.tmp/
+tmp/
 web-dist/
 
 nohup.out
