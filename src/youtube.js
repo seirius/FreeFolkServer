@@ -1,14 +1,5 @@
 
-const path = require("path");
-
-const YOUTUBE = require("freefolkcommon").YOUTUBE({
-    CREDENTIALS: require("./../FreefolkCredentials.json"),
-    tmpDir: path.join(__dirname, "..", "tmp"),
-    ffmpegPaths: {
-        // linuxPath: path.join(__dirname, "..", "ffmpeg-src", "debian-64/ffmpeg"),
-        // windowsPath: path.join(__dirname, "..", "ffmpeg-src", "win-64/bin/ffmpeg")
-    }
-});
+const { YOUTUBE } = require("./free-folk-common-barrel");
 
 const YOUTUBE_MAPPING = (args) => {
     /** @type {import("express").Express} */

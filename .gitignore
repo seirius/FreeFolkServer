@@ -64,5 +64,6 @@ FreefolkCredentials.json
 
 .well-known/
 .tmp/
+.web-dist/
 
 nohup.out
