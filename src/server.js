@@ -5,7 +5,7 @@ exports.START_SERVER = async function (args) {
     const session = require('express-session');
     const MongoStore = require('connect-mongo')(session);
     const cookieParser = require('cookie-parser');
-    const { loadConfig } = require("./config");
+    const { loadConfig, credentialsPresent, secureRedirect } = require("./config");
 
     const http = require("http");
     const https = require("https");
@@ -38,14 +38,20 @@ exports.START_SERVER = async function (args) {
 
     require("./youtube").YOUTUBE_MAPPING({ app });
     require("./user-config").CONFIG_MAPPING({ app });
+    require("./meta").META_MAPPING({ app });
+    require("./util").UTIL_MAPPING({ app });
 
     app.use('/home', express.static(path.join(__dirname, "..", "web-dist")));
-    app.get('/home*', (req, res) => res.sendFile(path.join(__dirname, "..", "web-dist", "index.html")));
+    app.get('/home/**', (req, res) => {
+        if (secureRedirect({credentials: config.credentials, req, res})) {
+            return;
+        }
+        res.sendFile(path.join(__dirname, "..", "web-dist", "index.html"));
+    });
 
     app.all("*", (req, res) => {
-        if (config.credentials && !req.secure) {
-            console.log("redirect to secure");
-            return res.redirect("https://" + req.hostname + req.url);
+        if (secureRedirect({credentials: config.credentials, req, res})) {
+            return;
         }
 
         return res.redirect("/home");
@@ -56,7 +62,7 @@ exports.START_SERVER = async function (args) {
     http.createServer(app)
         .listen(config.server.port, () => console.log(`FreeFolk is running on ${config.server.port}`));
 
-    if (config.credentials && Object.values(config.credentials).some(cred => cred)) {
+    if (credentialsPresent({credentials: config.credentials})) {
         https.createServer(config.credentials, app)
             .listen(443, () => console.log(`FreeFolkSecure is running on 443`));
     }

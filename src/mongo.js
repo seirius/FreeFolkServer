@@ -1,4 +1,5 @@
 const mongo = require("mongodb").MongoClient;
+const { YOUTUBE } = require("./free-folk-common-barrel");
 
 exports.connected = false;
 exports.USER_CONFIG = {
@@ -39,6 +40,9 @@ const connectionCallback = (
                         videoList: []
                     };
                 }
+                
+                const defaultItem = YOUTUBE.getDefVideoItem();
+                config.videoList.forEach(video => video.dwnProgress = defaultItem.dwnProgress);
 
                 if (response) {
                     userConfig.updateOne({_id: response._id}, {$set: {config: config}})
