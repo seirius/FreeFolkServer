@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const { promisify } = require("util");
 
 const readFile = promisify(fs.readFile);
@@ -13,6 +14,10 @@ const DEFAULT_CONFIG = function () {
         server: {
             port: 3000
         },
+        web: {
+            distPath: path.join(__dirname, "..", "web-dist"),
+            basePath: "home"
+        },
         mongodb: {
             host: "127.0.0.1",
             port: 27017,
@@ -21,6 +26,9 @@ const DEFAULT_CONFIG = function () {
         session: {
             secret: "fffffffffffffffffffff23",
             name: "FFSession"
+        },
+        expose: {
+            files: []
         }
     };
 };

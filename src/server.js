@@ -14,7 +14,7 @@ exports.START_SERVER = async function (args) {
 
     const { configPath } = args;
 
-    let config = await loadConfig({ configPath });
+    const config = await loadConfig({ configPath });
 
     app.use(cookieParser());
     app.use(bodyParser.json());
@@ -41,20 +41,23 @@ exports.START_SERVER = async function (args) {
     require("./meta").META_MAPPING({ app });
     require("./util").UTIL_MAPPING({ app });
 
-    app.use('/home', express.static(path.join(__dirname, "..", "web-dist")));
-    app.get('/home/**', (req, res) => {
+    config.expose.files
+    .filter(exposedFile => exposedFile.httpPath && exposedFile.systemPath)
+    .forEach(exposedFile => app.get(exposedFile.httpPath, (req, res) => res.sendFile(exposedFile.systemPath)));
+
+    app.use(`/${config.web.basePath}`, express.static(config.web.distPath));
+    app.get(`/${config.web.basePath}/**`, (req, res) => {
         if (secureRedirect({credentials: config.credentials, req, res})) {
             return;
         }
-        res.sendFile(path.join(__dirname, "..", "web-dist", "index.html"));
+        res.sendFile(path.join(config.web.distPath, "index.html"));
     });
 
     app.all("*", (req, res) => {
         if (secureRedirect({credentials: config.credentials, req, res})) {
             return;
         }
-
-        return res.redirect("/home");
+        return res.redirect(`/${config.web.basePath}`);
     });
 
     app.use(express.static(__dirname, { dotfiles: "allow" }));
