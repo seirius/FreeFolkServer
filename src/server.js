@@ -45,6 +45,16 @@ exports.START_SERVER = async function (args) {
     .filter(exposedFile => exposedFile.httpPath && exposedFile.systemPath)
     .forEach(exposedFile => app.get(exposedFile.httpPath, (req, res) => res.sendFile(exposedFile.systemPath)));
 
+    config.webs.forEach(web => {
+        app.use(`/${web.basePath}`, express.static(web.distPath));
+        app.get(`/${web.basePath}/**`, (req, res) => {
+            if (secureRedirect({credentials: config.credentials, req, res})) {
+                return;
+            }
+            res.sendFile(path.join(web.distPath, "index.html"));
+        });
+    });
+
     app.use(`/${config.web.basePath}`, express.static(config.web.distPath));
     app.get(`/${config.web.basePath}/**`, (req, res) => {
         if (secureRedirect({credentials: config.credentials, req, res})) {

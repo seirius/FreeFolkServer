@@ -18,6 +18,7 @@ const DEFAULT_CONFIG = function () {
             distPath: path.join(__dirname, "..", "web-dist"),
             basePath: "home"
         },
+        webs: [],
         mongodb: {
             host: "127.0.0.1",
             port: 27017,
