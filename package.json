@@ -1,6 +1,6 @@
 {
   "name": "freefolkserver",
-  "version": "1.0.04",
+  "version": "1.0.05",
   "description": "FreeFolk Server",
   "main": "index.js",
   "scripts": {
