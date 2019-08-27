@@ -11,6 +11,9 @@
             "program": "${workspaceFolder}/src/main.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
+            ],
+            "args": [
+                "--config=../ff-config.json"
             ]
         }
     ]
